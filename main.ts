@@ -11,4 +11,17 @@ const ENTRY =
 
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
+
+// Self-validation: the gate requires 1-200 chars, not only whitespace,
+// and the entry is one text message, so a single line with no newline
+// characters inside it. Fail loudly rather than write a bad entry.
+if (ENTRY.length < 1 || ENTRY.length > 200) {
+  throw new Error(`entry length ${ENTRY.length} outside 1-200`);
+}
+if (ENTRY.trim().length === 0) {
+  throw new Error("entry is only whitespace");
+}
+if (ENTRY.includes("\n") || ENTRY.includes("\r")) {
+  throw new Error("entry must be a single line (no newline characters)");
+}
 writeFileSync(join(outDir, "entry.txt"), ENTRY, "utf8");
